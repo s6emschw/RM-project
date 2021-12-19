@@ -34,7 +34,7 @@ def plot_betas(dfs, alphas, reg_type):
         #plt.show()
 
 
-def plot_average_betas(dfs, alphas, reg_type):
+def plot_average_betas_1(dfs, alphas, reg_type):
 
     plt.figure(figsize = (40, 25))
     count = 1
@@ -59,6 +59,35 @@ def plot_average_betas(dfs, alphas, reg_type):
         plt.axis("tight")
         count += 1
         #plt.show()
+        
+def plot_average_betas_2(dfs, alphas, L_w, reg_type):
+
+    plt.figure(figsize = (40, 25))
+    count = 1
+
+    for i, a in zip(dfs, alphas):
+        plt.subplot(2, 2, count)
+    
+        ax = plt.gca()
+    
+        ax.plot(a, i)
+    
+        ax.set_xscale("log")
+        ax.set_xlim(ax.get_xlim()[::-1])  # reverse axis
+    
+        plt.xlabel("alpha", fontsize = 25)
+        plt.ylabel("weights", fontsize = 25)
+    
+        ax.tick_params(axis='both', which='major', labelsize = 20)
+        ax.set_ylim([0, 6])
+        
+        if reg_type == "Average elastic net":
+            plt.title(f"{reg_type} coefficients as a function of $\lambda$, p = {i.shape[1]}, L_ratio = {L_w} ", fontsize = 28)
+        else:
+            plt.title(f"{reg_type} coefficients as a function of $\lambda$, p = {i.shape[1]} ", fontsize = 28)
+        plt.axis("tight")
+        count += 1
+        plt.show()
         
 def plot_ols_beta_distribution(df): 
 
