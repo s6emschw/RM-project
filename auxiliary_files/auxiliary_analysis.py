@@ -8,6 +8,7 @@ import statsmodels.api as sm
 import seaborn as sns
 from mlxtend.evaluate import bias_variance_decomp
 from sklearn import metrics
+from sklearn import linear_model
 
 
 
