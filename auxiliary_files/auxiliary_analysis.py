@@ -104,6 +104,36 @@ def iterate_ridge(n, p, q, min_cor, max_cor, iterations_sim, true_betas, alphas)
     return df_list_betas_ridge, df_list_var_ridge
 
 
+def iterate_lasso_sklearn(n, p, q, min_cor, max_cor, iterations_sim, true_betas, alphas):
+    
+    lasso_beta_names = []
+    
+    for value in range(1, p + 1): 
+        column_betas = f"beta_{value}"
+        lasso_beta_names.append(column_betas)
+
+    df_list_betas_lasso = []
+
+    for i in range(iterations_sim):
+        
+        true_betas_sim = true_betas
+    
+        y_noise, X, df = get_sim_data(p, q, n, min_cor, max_cor, true_betas_sim) 
+        matr_beta = []
+    
+        for a in alphas: 
+        
+            lasso_model = linear_model.Lasso(alpha=a).fit(X,y_noise) 
+            lasso_beta = np.array(lasso_model.coef_)
+            matr_beta.append(lasso_beta)
+            df_lasso_betas = pd.DataFrame(matr_beta, columns = lasso_beta_names)
+        
+         
+        df_list_betas_lasso.append(df_lasso_betas)
+        
+    return df_list_betas_lasso
+
+
 def get_ridge_var_distribution(df, iterations, alpha_low, alpha_med, alpha_high):
 
 
