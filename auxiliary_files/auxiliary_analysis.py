@@ -1,6 +1,6 @@
 import numpy as np 
 import pandas as pd 
-from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.linear_model import LinearRegression, Ridge, ElasticNet
 from sklearn.preprocessing import StandardScaler
 from functools import reduce  
 import matplotlib.pyplot as plt
@@ -12,7 +12,7 @@ from sklearn import linear_model
 
 
 
-def get_sim_data(p, q, n, min_cor, max_cor, true_betas):
+def get_sim_data(n, p, q, min_cor, max_cor, true_betas):
     
     #p is the number of correlated regressors
     #q is the number of uncorrelated regressors
@@ -134,8 +134,63 @@ def iterate_lasso_sklearn(n, p, q, min_cor, max_cor, iterations_sim, true_betas,
         
     return df_list_betas_lasso
 
+def iterate_elnet(n, p, q, min_cor, max_cor, iterations_sim, true_betas, alphas, L_w):
+    
+    elnet_beta_names = []
+    
+    for value in range(1, p+q + 1): 
+    
+        column_betas = f"beta_{value}"
+        elnet_beta_names.append(column_betas)
+
+    df_list_betas_elnet = []
+
+    for i in range(iterations_sim):
+        
+        true_betas_sim = true_betas
+    
+        y, X, df = get_sim_data(n, p, q, min_cor, max_cor, true_betas_sim) 
+        matr_beta = []
+        
+        #for L_w in L_weight:
+    
+        for a in alphas: 
+        
+            elnet_model = ElasticNet(alpha=a, l1_ratio=L_w).fit(X,y)
+            elnet_beta = np.array(elnet_model.coef_)
+            matr_beta.append(elnet_beta)
+            df_elnet_betas = pd.DataFrame(matr_beta, columns = elnet_beta_names)
+        
+         
+        df_list_betas_elnet.append(df_elnet_betas)
+        
+    return df_list_betas_elnet
 
 def get_ridge_var_distribution(df, iterations, alpha_low, alpha_med, alpha_high):
+
+
+    betas_low_alpha = []
+    betas_med_alpha = []
+    betas_high_alpha = []
+
+    for i in list(range(iterations)): 
+
+        betas_low_a = np.array(df[i].iloc[alpha_low, :])
+        betas_med_a = np.array(df[i].iloc[alpha_med, :])
+        betas_high_a = np.array(df[i].iloc[alpha_high, :])
+    
+        betas_low_alpha.append(betas_low_a)
+        betas_med_alpha.append(betas_med_a)
+        betas_high_alpha.append(betas_high_a)
+    
+        df_low_a = pd.DataFrame(betas_low_alpha)
+        df_med_a = pd.DataFrame(betas_med_alpha)
+        df_high_a = pd.DataFrame(betas_high_alpha)
+        
+    
+    return df_low_a, df_med_a, df_high_a
+
+def get_elnet_var_distribution(df, iterations, alpha_low, alpha_med, alpha_high):
 
 
     betas_low_alpha = []
