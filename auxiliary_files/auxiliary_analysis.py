@@ -78,7 +78,7 @@ def iterate_ridge(n, p, q, min_cor, max_cor, iterations_sim, true_betas, alphas)
         
         true_betas_sim = true_betas
     
-        y_noise, X, df = get_sim_data(p, q, n, min_cor, max_cor, true_betas_sim) 
+        y_noise, X, df = get_sim_data(n, p, q, min_cor, max_cor, true_betas_sim) 
         
         i, k = X.shape
         I = np.identity(k)
@@ -119,7 +119,7 @@ def iterate_lasso_sklearn(n, p, q, min_cor, max_cor, iterations_sim, true_betas,
         
         true_betas_sim = true_betas
     
-        y_noise, X, df = get_sim_data(p, q, n, min_cor, max_cor, true_betas_sim) 
+        y_noise, X, df = get_sim_data(n, p, q, min_cor, max_cor, true_betas_sim) 
         matr_beta = []
     
         for a in alphas: 
