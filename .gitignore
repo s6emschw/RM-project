@@ -1,0 +1,4 @@
+__pxcache__/
+*.pyc
+.idea/
+*.html
