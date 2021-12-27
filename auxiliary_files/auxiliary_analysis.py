@@ -124,7 +124,7 @@ def iterate_lasso_sklearn(n, p, q, min_cor, max_cor, iterations_sim, true_betas,
     
         for a in alphas: 
         
-            lasso_model = linear_model.Lasso(alpha=a).fit(X,y_noise) 
+            lasso_model = linear_model.Lasso(alpha=a, fit_intercept=False).fit(X,y_noise) 
             lasso_beta = np.array(lasso_model.coef_)
             matr_beta.append(lasso_beta)
             df_lasso_betas = pd.DataFrame(matr_beta, columns = lasso_beta_names)
@@ -190,6 +190,30 @@ def get_ridge_var_distribution(df, iterations, alpha_low, alpha_med, alpha_high)
     
     return df_low_a, df_med_a, df_high_a
 
+def get_lasso_var_distribution(df, iterations, alpha_low, alpha_med, alpha_high):
+
+
+    betas_low_alpha = []
+    betas_med_alpha = []
+    betas_high_alpha = []
+
+    for i in list(range(iterations)): 
+
+        betas_low_a = np.array(df[i].iloc[alpha_low, :])
+        betas_med_a = np.array(df[i].iloc[alpha_med, :])
+        betas_high_a = np.array(df[i].iloc[alpha_high, :])
+    
+        betas_low_alpha.append(betas_low_a)
+        betas_med_alpha.append(betas_med_a)
+        betas_high_alpha.append(betas_high_a)
+    
+        df_low_a = pd.DataFrame(betas_low_alpha)
+        df_med_a = pd.DataFrame(betas_med_alpha)
+        df_high_a = pd.DataFrame(betas_high_alpha)
+        
+    
+    return df_low_a, df_med_a, df_high_a
+
 def get_elnet_var_distribution(df, iterations, alpha_low, alpha_med, alpha_high):
 
 
@@ -213,3 +237,33 @@ def get_elnet_var_distribution(df, iterations, alpha_low, alpha_med, alpha_high)
         
     
     return df_low_a, df_med_a, df_high_a
+
+
+
+def generate_true_betas(non_zero_betas, zero_betas):
+
+    store_true_betas = []
+
+    for i, j in zip(non_zero_betas, zero_betas): 
+    
+        non_zeros = np.repeat(5, i)
+        zeros = np.repeat(0, j)
+    
+        true_betas = np.concatenate([non_zeros, zeros])
+        store_true_betas.append(true_betas)
+        
+    return store_true_betas
+
+
+def gen_true_betas_lasso(non_zero_betas, zero_betas):
+
+    true_betas = []
+
+    for i, j in zip(non_zero_betas, zero_betas): 
+    
+        non_zeros = np.repeat(5, i)
+        zeros = np.repeat(0, j)
+    
+        true_betas = np.concatenate([non_zeros, zeros])
+        
+    return true_betas
