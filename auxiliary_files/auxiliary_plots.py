@@ -66,6 +66,36 @@ def plot_average_betas(dfs, alphas, L_w, reg_type):
         
         count += 1
         
+def plot_betas_single_case(df, alphas, L_w, reg_type):
+    plt.figure(figsize = (20, 10))
+    count = 1
+
+    plt.subplot(1, 1, count)
+
+    ax = plt.gca()
+
+    ax.plot(df)
+
+    ax.set_xscale("log")
+    ax.set_xlim(ax.get_xlim()[::-1])  # reverse axis
+
+    plt.xlabel(f"$\lambda$", fontsize = 25)
+    plt.ylabel("weights", fontsize = 25)
+
+    ax.tick_params(axis='both', which='major', labelsize = 20)
+    ax.set_ylim([0, 6])
+    #plt.axhline(y=0, color='black', linestyle='--')
+    if reg_type == "Average elastic net":
+            
+            plt.title(f"{reg_type} coefficients as a function of $\lambda$, p = {df.shape[1]}, L_ratio = {L_w} ", fontsize = 28)
+        
+    else:
+           
+            plt.title(f"{reg_type} coefficients as a function of $\lambda$, p = {df.shape[1]} ", fontsize = 28)
+    plt.axis("tight")
+    count += 1
+    
+        
 def plot_average_betas_elnet(dfs, alphas, L_w, reg_type):
 
     plt.figure(figsize = (40,30))
