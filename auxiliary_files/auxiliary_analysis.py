@@ -156,7 +156,7 @@ def iterate_elnet(n, p, q, min_cor, max_cor, iterations_sim, true_betas, alphas,
     
         for a in alphas: 
         
-            elnet_model = ElasticNet(alpha=a, l1_ratio=L_w).fit(X,y)
+            elnet_model = ElasticNet(alpha=a, l1_ratio=L_w, fit_intercept=False).fit(X,y)
             elnet_beta = np.array(elnet_model.coef_)
             matr_beta.append(elnet_beta)
             df_elnet_betas = pd.DataFrame(matr_beta, columns = elnet_beta_names)
