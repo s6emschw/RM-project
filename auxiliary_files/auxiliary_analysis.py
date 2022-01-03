@@ -242,7 +242,7 @@ def get_elnet_var_distribution(df, iterations, alpha_low, alpha_med, alpha_high)
 
 def generate_true_betas(non_zero_betas, zero_betas):
 
-    store_true_betas = []
+    true_betas = []
 
     for i, j in zip(non_zero_betas, zero_betas): 
     
@@ -250,9 +250,8 @@ def generate_true_betas(non_zero_betas, zero_betas):
         zeros = np.repeat(0, j)
     
         true_betas = np.concatenate([non_zeros, zeros])
-        store_true_betas.append(true_betas)
         
-    return store_true_betas
+    return true_betas
 
 
 def gen_true_betas_lasso(non_zero_betas, zero_betas):
