@@ -124,7 +124,7 @@ def iterate_lasso_sklearn(n, p, q, min_cor, max_cor, iterations_sim, true_betas,
     
         for a in alphas: 
         
-            lasso_model = linear_model.Lasso(alpha=a, fit_intercept=False).fit(X,y_noise) 
+            lasso_model = linear_model.Lasso(alpha=a).fit(X,y_noise) 
             lasso_beta = np.array(lasso_model.coef_)
             matr_beta.append(lasso_beta)
             df_lasso_betas = pd.DataFrame(matr_beta, columns = lasso_beta_names)
@@ -156,7 +156,7 @@ def iterate_elnet(n, p, q, min_cor, max_cor, iterations_sim, true_betas, alphas,
     
         for a in alphas: 
         
-            elnet_model = ElasticNet(alpha=a, l1_ratio=L_w, fit_intercept=False).fit(X,y)
+            elnet_model = ElasticNet(alpha=a, l1_ratio=L_w).fit(X,y)
             elnet_beta = np.array(elnet_model.coef_)
             matr_beta.append(elnet_beta)
             df_elnet_betas = pd.DataFrame(matr_beta, columns = elnet_beta_names)
@@ -238,31 +238,111 @@ def get_elnet_var_distribution(df, iterations, alpha_low, alpha_med, alpha_high)
     
     return df_low_a, df_med_a, df_high_a
 
+def generate_true_betas(non_zero_betas, zero_betas, size_nonzero):
 
-
-def generate_true_betas(non_zero_betas, zero_betas):
-
-    true_betas = []
+    store_true_betas = []
 
     for i, j in zip(non_zero_betas, zero_betas): 
     
-        non_zeros = np.repeat(5, i)
+        non_zeros = np.repeat(size_nonzero, i)
         zeros = np.repeat(0, j)
     
         true_betas = np.concatenate([non_zeros, zeros])
+        store_true_betas.append(true_betas)
         
-    return true_betas
+    return store_true_betas
 
+def get_predictions(n, p, q, min_cor, max_cor, true_betas, iterations, alphas, X_test): 
 
-def gen_true_betas_lasso(non_zero_betas, zero_betas):
+    store_predictions_list_ridge = []
+    store_predictions_list_lasso = []
+    store_predictions_list_elnet_20 = []
+    store_predictions_list_elnet_50 = []
+    store_predictions_list_elnet_70 = []
 
-    true_betas = []
-
-    for i, j in zip(non_zero_betas, zero_betas): 
+    for i in range(iterations):
     
-        non_zeros = np.repeat(5, i)
-        zeros = np.repeat(0, j)
+        store_predictions_ridge = []
+        store_predictions_lasso = []
+        store_predictions_elnet_20 = []
+        store_predictions_elnet_50 = []
+        store_predictions_elnet_70 = []
     
-        true_betas = np.concatenate([non_zeros, zeros])
+        y_train, X_train, df_train = get_sim_data(n, p, q, min_cor, max_cor, true_betas) # get test data 
+
+        for a in alphas: 
+
+            ridge = Ridge(alpha=a, fit_intercept=False).fit(X_train, y_train)
+            ridge_predict = ridge.predict(X_test)
+            ridge_predict_select = ridge_predict[14]
+            store_predictions_ridge.append(ridge_predict_select) 
         
-    return true_betas
+            lasso = Lasso(alpha=a, fit_intercept=False).fit(X_train, y_train)
+            lasso_predict = lasso.predict(X_test)
+            lasso_predict_select = lasso_predict[14]
+            store_predictions_lasso.append(lasso_predict_select) 
+        
+            elnet_20 = ElasticNet(alpha=a, l1_ratio=0.2, fit_intercept=False).fit(X_train, y_train)
+            elnet_20_predict = elnet_20.predict(X_test)
+            elnet_20_predict_select = elnet_20_predict[14]
+            store_predictions_elnet_20.append(elnet_20_predict_select)
+        
+            elnet_50 = ElasticNet(alpha=a, l1_ratio=0.5, fit_intercept=False).fit(X_train, y_train)
+            elnet_50_predict = elnet_50.predict(X_test)
+            elnet_50_predict_select = elnet_50_predict[14]
+            store_predictions_elnet_50.append(elnet_50_predict_select)
+        
+            elnet_70 = ElasticNet(alpha=a, l1_ratio=0.7, fit_intercept=False).fit(X_train, y_train)
+            elnet_70_predict = elnet_70.predict(X_test)
+            elnet_70_predict_select = elnet_70_predict[14]
+            store_predictions_elnet_70.append(elnet_70_predict_select)
+    
+        store_predictions_list_ridge.append(store_predictions_ridge)
+        store_predictions_list_lasso.append(store_predictions_lasso)
+        store_predictions_list_elnet_20.append(store_predictions_elnet_20)
+        store_predictions_list_elnet_50.append(store_predictions_elnet_50)
+        store_predictions_list_elnet_70.append(store_predictions_elnet_70)
+        
+        store_predictions_df_ridge = pd.DataFrame(store_predictions_list_ridge)
+        store_predictions_df_lasso = pd.DataFrame(store_predictions_list_lasso)
+        store_predictions_df_elnet_20 = pd.DataFrame(store_predictions_list_elnet_20)
+        store_predictions_df_elnet_50 = pd.DataFrame(store_predictions_list_elnet_50)
+        store_predictions_df_elnet_70 = pd.DataFrame(store_predictions_list_elnet_70)
+        
+    predictions_dfs = [store_predictions_df_ridge, store_predictions_df_lasso, store_predictions_df_elnet_20,
+                           store_predictions_df_elnet_50, store_predictions_df_elnet_70]
+        
+    return predictions_dfs
+
+def compute_mse(predictions_df_list, y_test):
+
+    store_mse_lists = []
+    store_variance_lists = []
+    store_bias_sq_lists = []
+
+    for df in enumerate(predictions_df_list):
+    
+        store_mse = []
+        store_variance = []
+        store_bias_sq = []
+    
+        for i in df[1].columns: 
+
+            mse = np.sum((np.asarray(df[1].iloc[:,i]) - y_test.iloc[14])**2) / iterations
+            variance = np.mean((np.mean(df[1].iloc[:,i]) - np.asarray(df[1].iloc[:,i]))**2)
+            bias_squared = (np.mean(df[1].iloc[:,i]) - y_test.iloc[14])**2
+    
+            store_mse.append(mse)
+            store_variance.append(variance)
+            store_bias_sq.append(bias_squared)
+    
+        store_mse_lists.append(store_mse)
+        store_variance_lists.append(store_variance)
+        store_bias_sq_lists.append(store_bias_sq)
+    
+    return store_mse_lists, store_variance_lists, store_bias_sq_lists
+
+
+
+
+
