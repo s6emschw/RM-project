@@ -328,7 +328,7 @@ def generate_true_betas(non_zero_betas, zero_betas, size_nonzero):
         
     return store_true_betas
 
-def get_predictions(n, p, q, min_cor, max_cor, true_betas, iterations, alphas, X_test): 
+def get_predictions(n, p, true_betas, cor_factor, iterations, alphas, X_test): 
 
     store_predictions_list_ridge = []
     store_predictions_list_lasso = []
@@ -344,7 +344,7 @@ def get_predictions(n, p, q, min_cor, max_cor, true_betas, iterations, alphas, X
         store_predictions_elnet_50 = []
         store_predictions_elnet_70 = []
     
-        y_train, X_train, df_train = get_sim_data(n, p, q, min_cor, max_cor, true_betas) # get test data 
+        y_train, X_train, df_train = get_sim_data(n, p, cor_factor, true_betas) # get test data 
 
         for a in alphas: 
 
