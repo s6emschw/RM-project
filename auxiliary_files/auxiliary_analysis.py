@@ -1,6 +1,6 @@
 import numpy as np 
 import pandas as pd 
-from sklearn.linear_model import LinearRegression, Ridge, ElasticNet
+from sklearn.linear_model import LinearRegression, Ridge, ElasticNet, Lasso
 from sklearn.preprocessing import StandardScaler
 from functools import reduce  
 import matplotlib.pyplot as plt
@@ -12,7 +12,7 @@ from sklearn import linear_model
 
 
 
-def get_sim_data(n, p, q, min_cor, max_cor, true_betas):
+def get_sim_data_old(n, p, q, min_cor, max_cor, true_betas):
     
     #p is the number of correlated regressors
     #q is the number of uncorrelated regressors
@@ -58,6 +58,50 @@ def get_sim_data(n, p, q, min_cor, max_cor, true_betas):
     
     return y, X, df
 
+def get_sim_data(n, p, cor_factor, true_betas):
+    
+    sd_vec = np.ones(p) 
+    mean = np.zeros(p)
+    
+    
+    cor_matrix = np.zeros([p,p])
+    store_corr = []
+
+    for i in list(range(1, p)):
+    
+        for j in list(range(i + 1, p + 1)): 
+            
+            corr = cor_factor ** abs(i - j)
+            store_corr.append(corr)
+
+    cor_matrix[np.triu_indices(p, 1)] = store_corr
+    cor_matrix[np.tril_indices(p, -1)] = cor_matrix.T[np.tril_indices(p, -1)]
+    np.fill_diagonal(cor_matrix, 1)
+    
+    D = np.diag(sd_vec)
+    sigma = D.dot(cor_matrix).dot(D)
+    
+    X = np.random.multivariate_normal(mean, sigma, n)
+    
+    eps = np.random.normal(0, 1, n)
+
+    y = X.dot(true_betas) + eps 
+    
+    y = pd.Series(y, name = "y")
+    
+    column_names = []
+    
+    for value in range(1, p + 1): 
+        
+        column = f"X_{value}"
+        column_names.append(column)
+        
+    
+    X = pd.DataFrame(X, columns = column_names)
+    
+    df = pd.concat([y, X], axis = 1)
+    
+    return y, X, df
 
 def iterate_ridge(n, p, q, min_cor, max_cor, iterations_sim, true_betas, alphas):
     
@@ -134,7 +178,7 @@ def iterate_lasso_sklearn(n, p, q, min_cor, max_cor, iterations_sim, true_betas,
         
     return df_list_betas_lasso
 
-def iterate_elnet(n, p, q, min_cor, max_cor, iterations_sim, true_betas, alphas, L_w):
+def iterate_elnet_old(n, p, q, min_cor, max_cor, iterations_sim, true_betas, alphas, L_w):
     
     elnet_beta_names = []
     
@@ -149,7 +193,39 @@ def iterate_elnet(n, p, q, min_cor, max_cor, iterations_sim, true_betas, alphas,
         
         true_betas_sim = true_betas
     
-        y, X, df = get_sim_data(n, p, q, min_cor, max_cor, true_betas_sim) 
+        y, X, df = get_sim_data_old(n, p, q, min_cor, max_cor, true_betas_sim) 
+        matr_beta = []
+        
+        #for L_w in L_weight:
+    
+        for a in alphas: 
+        
+            elnet_model = ElasticNet(alpha=a, l1_ratio=L_w).fit(X,y)
+            elnet_beta = np.array(elnet_model.coef_)
+            matr_beta.append(elnet_beta)
+            df_elnet_betas = pd.DataFrame(matr_beta, columns = elnet_beta_names)
+        
+         
+        df_list_betas_elnet.append(df_elnet_betas)
+        
+    return df_list_betas_elnet
+
+def iterate_elnet(n, p, cor_factor, iterations_sim, true_betas, alphas, L_w):
+    
+    elnet_beta_names = []
+    
+    for value in range(1, p + 1): 
+    
+        column_betas = f"beta_{value}"
+        elnet_beta_names.append(column_betas)
+
+    df_list_betas_elnet = []
+
+    for i in range(iterations_sim):
+        
+        true_betas_sim = true_betas
+    
+        y, X, df = get_sim_data(n, p, cor_factor, true_betas) 
         matr_beta = []
         
         #for L_w in L_weight:
@@ -272,27 +348,27 @@ def get_predictions(n, p, q, min_cor, max_cor, true_betas, iterations, alphas, X
 
         for a in alphas: 
 
-            ridge = Ridge(alpha=a, fit_intercept=False).fit(X_train, y_train)
+            ridge = Ridge(alpha=a).fit(X_train, y_train)
             ridge_predict = ridge.predict(X_test)
             ridge_predict_select = ridge_predict[14]
             store_predictions_ridge.append(ridge_predict_select) 
         
-            lasso = Lasso(alpha=a, fit_intercept=False).fit(X_train, y_train)
+            lasso = Lasso(alpha=a).fit(X_train, y_train)
             lasso_predict = lasso.predict(X_test)
             lasso_predict_select = lasso_predict[14]
             store_predictions_lasso.append(lasso_predict_select) 
         
-            elnet_20 = ElasticNet(alpha=a, l1_ratio=0.2, fit_intercept=False).fit(X_train, y_train)
+            elnet_20 = ElasticNet(alpha=a, l1_ratio=0.2).fit(X_train, y_train)
             elnet_20_predict = elnet_20.predict(X_test)
             elnet_20_predict_select = elnet_20_predict[14]
             store_predictions_elnet_20.append(elnet_20_predict_select)
         
-            elnet_50 = ElasticNet(alpha=a, l1_ratio=0.5, fit_intercept=False).fit(X_train, y_train)
+            elnet_50 = ElasticNet(alpha=a, l1_ratio=0.5).fit(X_train, y_train)
             elnet_50_predict = elnet_50.predict(X_test)
             elnet_50_predict_select = elnet_50_predict[14]
             store_predictions_elnet_50.append(elnet_50_predict_select)
         
-            elnet_70 = ElasticNet(alpha=a, l1_ratio=0.7, fit_intercept=False).fit(X_train, y_train)
+            elnet_70 = ElasticNet(alpha=a, l1_ratio=0.7).fit(X_train, y_train)
             elnet_70_predict = elnet_70.predict(X_test)
             elnet_70_predict_select = elnet_70_predict[14]
             store_predictions_elnet_70.append(elnet_70_predict_select)
