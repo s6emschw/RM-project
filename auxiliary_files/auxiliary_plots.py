@@ -122,15 +122,14 @@ def plot_betas_single_case(df, alphas, L_w, reg_type):
             plt.title(f"{reg_type} coefficients as a function of $\lambda$, p = {df.shape[1]} ", fontsize = 28)
     plt.axis("tight")
     count += 1
-    
-        
-def plot_average_betas_elnet(dfs, alphas, L_w, reg_type):
 
-    plt.figure(figsize = (40,30))
+def plot_average_betas_elnet(dfs, alphas, L_w):
+
+    plt.figure(figsize = (50,40))
     count = 1
 
     for i, a in zip(dfs, alphas):
-        plt.subplot(3, 2, count)
+        plt.subplot(2, 3, count)
     
         ax = plt.gca()
     
@@ -139,22 +138,21 @@ def plot_average_betas_elnet(dfs, alphas, L_w, reg_type):
         ax.set_xscale("log")
         ax.set_xlim(ax.get_xlim()[::-1])  # reverse axis
     
-        plt.xlabel("alpha", fontsize = 20)
-        plt.ylabel("weights", fontsize = 20)
+        plt.xlabel(f"$\lambda$", fontsize = 35)
+        plt.ylabel("weights", fontsize = 35)
     
-        ax.tick_params(axis='both', which='major', labelsize = 20)
+        ax.tick_params(axis='both', which='major', labelsize = 32)
         ax.set_ylim([0, 6])
         
         plt.axhline(y=0, color='black', linestyle='--')
         plt.axis("tight")
         
-        if reg_type == "Average elastic net":
-            plt.title(f"{reg_type} coefficients as a function of $\lambda$, p = {i.shape[1]}, L_ratio = {L_w[count-1]} ", fontsize = 28)
-        else:
-            plt.title(f"{reg_type} coefficients as a function of $\lambda$, p = {i.shape[1]} ", fontsize = 15)
+        plt.title(f"Average elastic net coefficients, p = {i.shape[1]}, L_ratio = {L_w[count-1]} ", fontsize = 40)
+      
         plt.axis("tight")
         count += 1
-        #plt.show()
+    
+    plt.savefig("elastic_net_plot_average_betas.png", bbox_inches='tight')
 
 def plot_ols_beta_distribution(df): 
 
@@ -196,8 +194,10 @@ def plot_ols_beta_distribution(df):
     fig_4.set_title(f"Distribution coefficients for p = {df[3].shape[1]}", fontsize=32)
     
     f.savefig('ols_distr.png', bbox_inches='tight')
+
+# delete plot_elnet_beta_distribution_old
     
-def plot_elnet_beta_distribution(df_low, df_med, df_high): 
+def plot_elnet_beta_distribution_old(df_low, df_med, df_high): 
 
     sns.set(style="white", palette="muted", color_codes=True)
     #rs = np.random.RandomState(10)
@@ -217,8 +217,10 @@ def plot_elnet_beta_distribution(df_low, df_med, df_high):
     fig_3.legend([],[], frameon=False)
     fig_3.title.set_text(f"Distribution of elastic net coefficients for high $\lambda$, p = {df_high.shape[1]}")
     plt.show()
+    
+# delete plot_shrunken_beta_distribution_old
 
-def plot_shrunken_beta_distribution(df_low, df_med, df_high, reg_type): 
+def plot_shrunken_beta_distribution_old(df_low, df_med, df_high, reg_type): 
 
     sns.set(style="white", palette="muted", color_codes=True)
 
@@ -250,4 +252,72 @@ def plot_shrunken_beta_distribution(df_low, df_med, df_high, reg_type):
     fig_3.set_title(f"Distribution of {reg_type} coefficients, high $\lambda$, p = {df_high.shape[1]}", fontsize=40)
     
     f.savefig(f"{reg_type}_shrunken_beta_dist_{df_low.shape[1]}.png", bbox_inches='tight')
+
+def plot_shrunken_beta_distribution(df_low, df_med, df_high, reg_type, nonzero_betas_mean, L_weight): 
+
+    sns.set(style="white", palette="muted", color_codes=True)
+
+    # Set up the matplotlib figure
+    
+    
+    if reg_type == "elastic net": 
+        
+        f, axes = plt.subplots(1, 3, figsize=(80, 30))
+        
+        fig_1=sns.kdeplot(data=df_low, ax=axes[0])
+        fig_1.legend([],[], frameon=False)
+        fig_1.axvline(x=nonzero_betas_mean, color='blue', linestyle='--')
+        fig_1.spines["bottom"].set_linestyle("dotted")
+        fig_1.tick_params(labelsize=40)
+        fig_1.set_ylabel("Density", fontsize=45)
+        fig_1.set_title(f"Distribution of {reg_type} coefficients, low $\lambda$, p = {df_low.shape[1]}, L_ratio = {L_weight}", fontsize=50)
+
+        fig_2=sns.kdeplot(data=df_med, ax=axes[1])
+        fig_2.legend([],[], frameon=False)
+        fig_2.axvline(x=nonzero_betas_mean, color='blue', linestyle='--')
+        fig_2.spines["bottom"].set_linestyle("dotted")
+        fig_2.tick_params(labelsize=40)
+        fig_2.set_ylabel("Density", fontsize=45)
+        fig_2.set_title(f"Distribution of {reg_type} coefficients, moderate $\lambda$, p = {df_med.shape[1]}, L_ratio = {L_weight}", fontsize=50)
+
+        fig_3=sns.kdeplot(data=df_high, ax=axes[2])
+        fig_3.legend([],[], frameon=False)
+        fig_3.axvline(x=nonzero_betas_mean, color='blue', linestyle='--')
+        fig_3.spines["bottom"].set_linestyle("dotted")
+        fig_3.tick_params(labelsize=40)
+        fig_3.set_ylabel("Density", fontsize=45)
+        fig_3.set_title(f"Distribution of {reg_type} coefficients, high $\lambda$, p = {df_high.shape[1]}, L_ratio = {L_weight}", fontsize=50)
+    
+        f.savefig(f"{reg_type}_shrunken_beta_dist_{df_low.shape[1]}_{L_weight}.png", bbox_inches='tight')
+    
+    else: 
+        
+        f, axes = plt.subplots(1, 3, figsize=(50, 16))
+
+        fig_1=sns.kdeplot(data=df_low, ax=axes[0])
+        fig_1.legend([],[], frameon=False)
+        fig_1.axvline(x=nonzero_betas_mean, color='blue', linestyle='--')
+        fig_1.spines["bottom"].set_linestyle("dotted")
+        fig_1.tick_params(labelsize=32)
+        fig_1.set_ylabel("Density", fontsize=37)
+        fig_1.set_title(f"Distribution of {reg_type} coefficients, low $\lambda$, p = {df_low.shape[1]}", fontsize=40)
+
+        fig_2=sns.kdeplot(data=df_med, ax=axes[1])
+        fig_2.legend([],[], frameon=False)
+        fig_2.axvline(x=nonzero_betas_mean, color='blue', linestyle='--')
+        fig_2.spines["bottom"].set_linestyle("dotted")
+        fig_2.tick_params(labelsize=32)
+        fig_2.set_ylabel("Density", fontsize=37)
+        fig_2.set_title(f"Distribution of {reg_type} coefficients, moderate $\lambda$, p = {df_med.shape[1]}", fontsize=40)
+
+        fig_3=sns.kdeplot(data=df_high, ax=axes[2])
+        fig_3.legend([],[], frameon=False)
+        fig_3.axvline(x=nonzero_betas_mean, color='blue', linestyle='--')
+        fig_3.spines["bottom"].set_linestyle("dotted")
+        fig_3.tick_params(labelsize=32)
+        fig_3.set_ylabel("Density", fontsize=37)
+        fig_3.set_title(f"Distribution of {reg_type} coefficients, high $\lambda$, p = {df_high.shape[1]}", fontsize=40)
+    
+        f.savefig(f"{reg_type}_shrunken_beta_dist_{df_low.shape[1]}.png", bbox_inches='tight')
+    
     

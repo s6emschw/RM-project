@@ -178,6 +178,8 @@ def iterate_lasso_sklearn(n, p, q, min_cor, max_cor, iterations_sim, true_betas,
         
     return df_list_betas_lasso
 
+
+# delete iterate_elnet_old
 def iterate_elnet_old(n, p, q, min_cor, max_cor, iterations_sim, true_betas, alphas, L_w):
     
     elnet_beta_names = []
@@ -241,6 +243,8 @@ def iterate_elnet(n, p, cor_factor, iterations_sim, true_betas, alphas, L_w):
         df_list_betas_elnet.append(df_elnet_betas)
         
     return df_list_betas_elnet
+
+# only need one general get_var_distribution function. 
 
 def get_ridge_var_distribution(df, iterations, alpha_low, alpha_med, alpha_high):
 
@@ -390,7 +394,7 @@ def get_predictions(n, p, true_betas, cor_factor, iterations, alphas, X_test):
         
     return predictions_dfs
 
-def compute_mse(predictions_df_list, y_test):
+def compute_mse(predictions_df_list, y_test, iterations):
 
     store_mse_lists = []
     store_variance_lists = []
