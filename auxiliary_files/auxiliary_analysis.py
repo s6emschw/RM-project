@@ -423,6 +423,3 @@ def compute_mse(predictions_df_list, y_test, iterations):
     return store_mse_lists, store_variance_lists, store_bias_sq_lists
 
 
-
-
-

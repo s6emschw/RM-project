@@ -319,5 +319,60 @@ def plot_shrunken_beta_distribution(df_low, df_med, df_high, reg_type, nonzero_b
         fig_3.set_title(f"Distribution of {reg_type} coefficients, high $\lambda$, p = {df_high.shape[1]}", fontsize=40)
     
         f.savefig(f"{reg_type}_shrunken_beta_dist_{df_low.shape[1]}.png", bbox_inches='tight')
-    
+
+def plot_cv_sim():
+
+    plt.figure(figsize = (25,10))
+
+    plt.subplot(1, 2, 1)
+    ax = plt.gca()
+    ax.plot(alphas, val_mean_ridge, color="red", label = "10-fold CV") # CV average ridge 10-fold
+    ax.plot(alphas, val_mean_ridge_loo, color="blue", label = "leave one out CV") # CV average ridge leave one out
+    #ax.plot(alphas, val_mean_lasso, color="purple") # CV average lasso 10-fold
+    #ax.plot(alphas, val_mean_lasso_loo, color="pink") # CV average lasso leave one out 
+    ax.plot(alphas, store_mse_1[0], color="black", label = "estimation of true mse") # true ridge
+    #ax.plot(alphas, store_mse_1[1], color="blue") # true lasso 
+    ax.set_xscale("log")
+    ax.set_xlim(ax.get_xlim()[::-1]) 
+    minimum_10_cv_ridge = [alphas[np.argmin(val_mean_ridge)], np.min(val_mean_ridge)]
+    minimum_loo_ridge = [alphas[np.argmin(val_mean_ridge_loo)], np.min(val_mean_ridge_loo)]
+    minimum_mse_true_ridge = [alphas[np.argmin(store_mse_1[0])], np.min(store_mse_1[0])]
+    ax.plot(*minimum_10_cv_ridge, "X", color="red")
+    ax.plot(*minimum_loo_ridge, "X", color="blue")
+    ax.plot(*minimum_mse_true_ridge, "X", color="black")
+    plt.xlabel(f"$\lambda$", fontsize = 20)
+    plt.ylabel("MSE", fontsize = 20)
+    ax.tick_params(axis='both', which='major', labelsize = 20)
+    ax.legend(fontsize=15)
+    plt.axis("tight")
+    plt.title("Validation curve, ridge", fontsize = 28)
+    plt.axis("tight")
+
+    plt.subplot(1, 2, 2)
+    ax = plt.gca()
+    #ax.plot(alphas, val_mean_ridge, color="dimgrey") # CV average ridge 10-fold
+    #ax.plot(alphas, val_mean_ridge_loo, color="green") # CV average ridge leave one out
+    ax.plot(alphas, val_mean_lasso, color="red", label = "10-fold CV") # CV average lasso 10-fold
+    ax.plot(alphas, val_mean_lasso_loo, color="blue", label = "leave one out CV") # CV average lasso leave one out 
+    #ax.plot(alphas, store_mse_1[0], color="red") # true ridge
+    ax.plot(alphas, store_mse_1[1], color="black", label = "estimation of true mse") # true lasso 
+    ax.set_xscale("log")
+    ax.set_xlim(ax.get_xlim()[::-1])
+    minimum_10_cv_lasso = [alphas[np.argmin(val_mean_lasso)], np.min(val_mean_lasso)]
+    minimum_loo_lasso = [alphas[np.argmin(val_mean_lasso_loo)], np.min(val_mean_lasso_loo)]
+    minimum_mse_true_lasso = [alphas[np.argmin(store_mse_1[1])], np.min(store_mse_1[1])]
+    ax.plot(*minimum_10_cv_lasso, "X", color="red")
+    ax.plot(*minimum_loo_lasso, "X", color="blue")
+    ax.plot(*minimum_mse_true_lasso, "X", color="black")
+    plt.xlabel(f"$\lambda$", fontsize = 20)
+    plt.ylabel("MSE", fontsize = 20)
+    ax.tick_params(axis='both', which='major', labelsize = 20)
+    ax.legend(fontsize=15)
+    plt.axis("tight")
+    plt.title("Validation curve, lasso", fontsize = 28)
+    plt.axis("tight") 
+
+    plt.savefig("CV_simulation.png", bbox_inches='tight')
+
+
     
