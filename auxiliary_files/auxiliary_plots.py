@@ -265,6 +265,28 @@ def plot_shrunken_beta_distribution(df_low, df_med, df_high, reg_type, nonzero_b
     
         f.savefig(f"{reg_type}_shrunken_beta_dist_{df_low.shape[1]}.png", bbox_inches='tight')
 
+
+def bias_var_tradeoff(alphas, mse, var, bias_sq):
+
+    plt.figure(figsize = (10,10))
+
+    ax = plt.gca()
+
+    mse = ax.plot(alphas, mse, label = "MSE")
+    variance = ax.plot(alphas, var, label = "variance")
+    bias_sq = ax.plot(alphas, bias_sq, label = "squared bias")
+    ax.set_xscale("log")
+    plt.xlabel(f"$\lambda$", fontsize = 20)
+    plt.ylabel("MSE", fontsize = 20)
+    ax.tick_params(axis='both', which='major', labelsize = 20)
+    plt.axis("tight")
+    plt.title("Bias-Variance Tradeoff", fontsize = 28)
+    ax.legend(["MSE", "variance", "squared bias"], fontsize=15)
+
+    plt.savefig("bias_var_tradeoff.png", bbox_inches='tight')
+
+
+
 def plot_cv_sim():
 
     plt.figure(figsize = (25,10))
