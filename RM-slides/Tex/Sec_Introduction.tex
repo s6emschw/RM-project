@@ -1,0 +1,37 @@
+%---------------------------------------------------------------------------%
+\lecture{Research Presentation}{lec_present_intro}
+%---------------------------------------------------------------------------%
+\section{Introduction}%
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Introduction: Drawbacks to OLS}
+    \begin{itemize}
+        \item Consider the following multivariate linear regression, where $Y=X\beta + \varepsilon$: 
+            \begin{itemize}
+                \item $Y=(y_1,...,y_n)$ $\in$ ${\rm I\!R^{n}}$ is the response vector
+                \item $X$ $\in$ ${\rm I\!R^{n \times p}}$ is the predictor variable matrix
+                \item $\varepsilon=¨(\varepsilon_1,...,\varepsilon_n)$ is the error vector
+            \end{itemize}
+        \item When is OLS a sub-optimal model for prediction? 
+            \begin{itemize}
+                \item Imperfect multicollinearity
+                    \begin{itemize}
+                        \item $cov(X_i, X_j)\neq 0$
+                        \item $\beta_{OLS}$ still BLUE, but variance and standard errors will increase.
+                        \item Leads to lower t-statistics.
+                    \end{itemize}
+                \item High-dimensionality ($p > n$)
+                    \begin{itemize}
+                        \item Rank $(X)$ $<$ $p$ such that OLS does not generate a unique solution.
+                        \item Variance of estimated coefficients becomes infinitely large.
+                    \end{itemize}
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile, c]
+\frametitle{Regularization Methods}
+    \begin{center}
+        \textbf{Solution:} Use regularization method(s) to reduce the variance of the model fit in exchange for a marginal increase in the bias.
+    \end{center}
+\end{frame}
