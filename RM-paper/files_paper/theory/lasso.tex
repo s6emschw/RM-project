@@ -1,0 +1,73 @@
+\subsection{Lasso}
+\label{section:lasso}
+\noindent Similar to the minimization problem solved for ridge regression, the lasso coefficients $\hat{\beta}^{L}$ minimize a penalized RSS characterized below:
+
+\begin{align}
+\label{eqn:eqn7}
+\hat{\beta}^{L} = \underset{\beta}{\operatorname{argmin}}\left\{\sum_{i=1}^{n}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} \beta_{j} x_{i j}\right)^{2}\right\} \text { subject to } \sum_{j=1}^{p}\left|\beta_{j}\right| \leq t,
+\end{align}
+
+
+%$$
+%\min _{\beta_o, \beta_1}\|\mathbf{y}-\beta_0 1- \mathbf{X} \beta\|_{2}^{2}
+%$$
+%subject to,
+%$$
+%\begin{aligned}
+%\|\beta\|_{1} \leq t
+%\end{aligned}
+%$$
+
+\noindent Rewriting the lasso minimization problem in the Lagrangian form, we obtain:
+
+\begin{align}
+\label{eqn:eqlasso}
+\hat{\beta}^{L} = \underset{\beta}{\operatorname{argmin}}\left\{\sum_{i=1}^{n}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} \beta_{j}  x_{i j}\right)^{2}+\lambda \sum_{j=1}^{p}\left|\beta_{j}\right|\right\}.
+\end{align}
+
+%\noindent for some $\lambda \geq 0$. 
+
+\noindent The lasso model replaces the $\ell_2$-norm of ridge with an $\ell_1$-norm expressed as $\sum_{1}^{p}\left|\beta_{j}\right|$. The $\ell_1$-norm makes $\sum_{1}^{p}\left|\beta_{j}\right|$ non-differentiable for ${\beta}_j=0$, indicating that the lasso optimization problem is a non-smooth function with a kink at ${\beta}_j=0$. As a result, the vector of lasso estimator $\hat{\beta}^{L}$ does not have a closed-form solution, since the derivative at zero is not unique. However, its subderivative at zero is defined, and thus it means that the lasso estimates $\hat{\beta}^{L}$ can be computed by solving its subgradient. This is an important result, since it means that the lasso model is capable of producing sparse models (i.e., variable selection) by setting irrelevant coefficients to exactly zero.\\
+
+\noindent We explore this feature of the lasso here. The following expression is a derivation from \cite{murphy2012machine} showing that the solution for when the subgradient is $\partial_{\beta_{j}} f(\mathbf{\beta})=0$ can occur at 3 possible values of $\beta_j$: 
+
+\begin{align}
+\label{eqn:eqsubgradient}
+\hat{\beta}_{j}\left(c_{j}\right)=\left\{\begin{array}{cc}\left(c_{j}+\lambda\right) / a_{j} & \text { if } c_{j}<-\lambda \\ 0 & \text { if } c_{j} \in[-\lambda, \lambda] \\ \left(c_{j}-\lambda\right) / a_{j} & \text { if } c_{j}>\lambda\end{array}\right.
+\end{align}
+
+\noindent where $c_j$ is the correlation of the $j$'th regressor with the residual conditioned on its correlation with other regressors; thus the parameter $c_j$ indicates the relevance of regressor $j$ for predicting $y_i$.\footnote{See Lemma 2.1. in \cite{buhlmann2011statistics} for an alternative formulation.} The relevant case is the one in the middle, which tells us that if $c_{j} \in[-\lambda, \lambda]$, then the regressor is only weekly correlated with the residual and therefore the subgradient is zero at $\hat{\beta_j}=0$. A detailed derivation of this result can be found in Section \ref{subgradient} of the Appendix. \\
+
+\noindent The subgradient solution for the lasso shows exactly why its model solution is \textbf{sparse}.
+Intuitively, as $\lambda$ increases, $c_j$ will be smaller in absolute value than $\lambda$ and thus more coefficients will be set to zero. Notice that the bias from the lasso estimator comes from shifting the OLS estimator $\beta_j=c_j/a_j$ up and down by $\lambda$. The procedure, also referred to as \textbf{soft thresholding}, is depicted in Figure \ref{fig:soft}. The black line represents $\beta_j=c_j/a_j$ - that is, OLS estimate without penalization. The red line represents the regularized $\hat{\beta}_j$ and shifts the OLS estimates up and down by $\lambda$, except at the interval $[-\lambda, \lambda]$, where $\hat{\beta}_j=0$. This is a key difference between ridge and lasso regression, as ridge cannot perform variable selection like lasso.\\ 
+
+\noindent The lasso solution is therefore more complex to compute as opposed to the ridge solution, and thus there are several algorithms used to solve the $\ell_1$ regularized minimization problem in equation \eqref{eqn:eqsubgradient}. We will focus on two of them in this paper. The first is the coordinate descent algorithm, and the second, known as the LARS algorithm  was developed by \cite{efron2004least}. The key difference between the two algorithms concerns the speed of convergence. See Section \ref{algorithms} for a general description of both.\footnote{Also see \cite{hastie2008fast} for a detailed description on the speedup advantages of coordinate descendent.}\\
+
+\noindent The sparsity property of the lasso can also be shown graphically in Figure \ref{fig:ridgelassoconstraint}, where we provide a comparative illustration of the $\ell_1$- and $\ell_2$-norms in a simple two-variate case. Here, $\hat{\beta}$ represents the coefficients estimated by OLS, while the circle and diamond centered at the graphs' origins characterize the constraint regions of ridge and lasso, respectively. The ellipses around $\hat{\beta}$ depict the RSS. The solutions for each shrinkage method are located where the RSS ellipse is tangent to each of the constraint regions. Since ridge uses a circular constraint, the RSS will never be tangent to the constraint at the axes, which means that the ridge estimated coefficients will always be non-zero. The lasso constraint, on the other hand, contains corner points along the axes with which the ellipse will typically intercept, setting one of coefficient estimates equal zero. \\
+
+\noindent Another important result from the lasso regarding sparsity is mentioned by \cite{james2013introduction}. The authors argue that lasso outperforms ridge regression in a setting where a high number of true coefficients equals zero (i.e., \textbf{high sparsity}), but underperforms if relatively few coefficients truly zero (i.e., \textbf{low sparsity}). This is shown by the authors through a simulation study, where they compare the prediction power of ridge and lasso by observing the test MSE. \cite{buhlmann2011statistics} formalize this distinction between high and low sparsity by studying the theoretical properties of the lasso model's prediction error, which we reproduce here. \\
+
+\noindent Let $\beta_j^0$ represent the true coefficient of the $j$th regressor and $S_0$ be the set $S_{0}:=\left\{j: \beta_{j}^{0} \neq 0\right\}$ such that $s_0$ represents the cardinality of the set and thus the sparsity index of the vector $\beta^0$. Furthermore, let $\mathscr{T}$ be the set $\mathscr{T}:=\left\{\max _{1 \leq j \leq p} 2\left|\varepsilon^{\prime} \mathbf{X}^{(j)}\right| / n \leq \lambda_{0}\right\}$. Then, according to  \cite{buhlmann2011statistics}, \textit{Theorem 6.1. Suppose the compatibility condition holds for $S_{0}$. Then on $\mathscr{T}$, we have for $\lambda \geq 2 \lambda_{0}$,
+$$
+\left\|\mathbf{X}\left(\hat{\beta}-\beta^{0}\right)\right\|_{2}^{2} / n+\lambda\left\|\hat{\beta}-\beta^{0}\right\|_{1} \leq 4 \lambda^{2} s_{0} / \phi_{0}^{2}.
+$$}
+
+\noindent The above theorem sets a bound for the lasso prediction error. The term $\left\|\mathbf{X}\left(\hat{\beta}-\beta^{0}\right)\right\|_{2}^{2} /n$ represents the OLS squared prediction error, while $\lambda\left\|\hat{\beta}-\beta^{0}\right\|_{1}$ is the $\ell_1$-norm error. The two terms combined yield the prediction error of the lasso minimization problem. The expression on the right hand side represents the bound of the prediction error on the lasso, and it is a function of the sparsity index $s_0$. This implies that the larger $s_0$ (i.e., the larger number of non-zero true $\beta$s), the larger the bound of the lasso prediction error. Similarly, the smaller $s_0$ (i.e., the smaller amount of non-zero $\beta$s in the true process), the smaller the bound of the prediction error. As such, if the true process is characterized by high sparsity, then the bounds of the lasso prediction error will be small enough so that the lasso model outperforms ridge.\footnote{The derivation and proof of Theorem 6.1. can be found in \cite{buhlmann2011statistics}, Chapter 6.} \\
+
+\noindent Following this derivation, we can also differentiate between two known bounds for the lasso: \textit{fast rate bounds} (shown in Theorem 6.1. from \cite{buhlmann2011statistics} and \textit{slow rate bounds}. We follow \cite{hebiri2012correlations} and we focus only on the description of the fast rate bound, since the slow rate bound only depends on the tuning parameter $\lambda$ and not on the sparsity index.\footnote{Although \cite{hebiri2012correlations} provide a good summary on the known bounds for lasso prediction error, \cite{tibshirani2016closer} also provide a very instructive theoretical analysis.} Fast rate bounds are bounds proportional to the square of $\lambda$ and are of the form found in Theorem 6.1. The fast rate bound is given by:
+
+\begin{align}
+    \left\|\mathbf{X}\left(\hat{\beta}-\beta^{0}\right)\right\|_{2}^{2} \leq \frac{\lambda^{2} {\bar{s}}}{n \phi^{2}({\bar{s}})},
+\end{align}
+
+\noindent where $\bar{s}$ is used to denote a vector of true zero coefficients. It is then straightforward to see that, to obtain the fast rates, $\bar{s}$ must be larger than $s_0$ (i.e. the sparsity must be high).\\
+
+% On the other hand, slow rate bounds are only proportional to the tuning parameter $\lambda$ and depend on $\left\|\beta_{0}\right\|_{1}$ instead of $\bar{s}$. Thus, they are considered to perform worse than the fast rate bounds: 
+
+% \begin{align}
+%     \left\|\mathbf{X}\left(\hat{\beta}-\beta^{0}\right)\right\|_{2}^{2} \leq 2 \lambda\left\|\beta^{0}\right\|_{1}.
+% \end{align}
+
+\noindent Finally, a potential drawback of the lasso arises when there is a high degree of correlation among regressors. Recall that lasso sets the estimated coefficient to zero when $c_j$ is sufficiently small, which indicates that the correlation between the $j$th feature and the residual $\mathbf{r}_{-j}=\mathbf{y}-\mathbf{X}_{:,-j} \mathbf{\beta}_{-j}$ (i.e., the residual conditioned on other regressors) is small. As a result, for two highly correlated coefficients, $x_j$ and $x_k$, lasso will only select one of the variables and set the other to zero, as it is only weakly correlated with the residual once the other regressor is included. Hence, using lasso in the presence of high correlation among regressors potentially excludes relevant coefficients from the fitted model and subsequently compromises prediction performance. 
+
+% For data sets with higher dimensionality, several of the lasso coefficient estimates may shrink to zero. In general, it is recommended to use ridge if we suspect the true model to be comprised of every explanatory variable in the matrix $\mathbf{X}$ with all coefficients being of similar size. One the other hand, Lasso performs better when relatively few regressors have large coefficients and the remaining regressors have little to no influence on predicting the outcome variable. When we account for the confounding influence of high multicollinearity, however, ridge typically outperforms lasso. In the following subsection, we examine how elastic net regression overcomes the drawbacks of lasso in the presence of multicollinearity.   

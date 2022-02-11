@@ -1,0 +1,93 @@
+\subsubsection{The Confounding Effects of Multicollinearity on a Multi-Linear Regression}
+
+\noindent If two or more predictors are linearly related, the information contained in the respective coefficient estimates does not independently describe the behavior of the respective predictor variables. Rather, the estimates are confounded by the collinear relationship that a given predictor has with the other covariates in the model (Kidwell and Brown 1982). As described by Hoerl and Kennard (1970 [1]), a strong indicator that a data set possesses some degree of multicollinearity is when $\mathbf X^{\prime} \mathbf X$ standardized to form the correlation matrix is not nearly a unit matrix. Another characteristic that is indicative of multicollinearity is a near-zero determinant of the simple correlation matrix, $\mathbf X^{\prime} \mathbf X$ (Kidwell and Brown 1982). \\
+
+\noindent Despite the OLS coefficient estimates of the predictor variables remaining unbiased and successfully minimizing the SSR in the presence of multicollinearity, the estimates no longer fulfill the assumption of efficiency and consequently exhibit inflated standard errors. This increase in variability among the OLS coefficient estimates introduces uncertainty, or noise, into the results of the regression equation, which rises as the magnitude of multicollinearity among the predictors increases. The uncertainty produced by inflated standard errors results in inconsistent regression estimates for different data samples. A further consequence of noise introduced by multicollinearity involves the estimates exhibiting incorrect signs that do not correspond with expectations derived from theory or previous research (Kidwell and Brown 1982). \\
+
+\noindent Mathematically, as the variance of the OLS $\hat{\beta}$s depends on the (constant) squared sigma of the regression's error term and the inverse of the simple correlation matrix, it is apparent that the $\hat{\beta}$s' variances become larger as the magnitude of correlation among the predictors increases. Another property of the OLS regression method to consider in the presence of multicollinearity is the squared distance between $\hat{\beta}$ and $\beta$. To ensure an accurate estimate, the researcher wishes to minimize this distance. After measuring the distance from $\hat{\beta}$ to $\beta$, the expected length is: 
+
+$$
+E\left[L_{1}^{2}\right]=\sigma^{2} \operatorname{Trace}\left(\mathbf{X}^{\prime} \mathbf{X}\right)^{-1},
+$$
+
+\noindent which yields a variance of 
+
+$$
+	\operatorname{VAR}\left[L_{1}^{2}\right]=2 \sigma^{4} \operatorname{Trace}\left(\mathbf{X}^{\prime} \mathbf{X}\right)^{-2},
+$$
+
+\noindent when the error terms are normally distributed (Hoerl and Kennard 1970 [1]). Observing the eigenvalues of the simple correlation matrix $\mathbf X^{\prime} \mathbf X$ demonstrates the inflationary effect of multicollinearity on the distance between the coefficient estimates and the true beta parameters(Marquardt and Snee 1975). Assuming the eigenvalues of $\mathbf X^{\prime} \mathbf X$ are strictly greater than zero, the expected value of the squared distance as well as the variance between $\beta$ and $\hat{\beta}$ can be described by the following equations: 
+
+$$
+E\left[L_{1}^{2}\right]=\sigma^{2} \sum_{i=1}^{p}\left(1 / \lambda_{i}\right)
+$$
+
+$$
+\operatorname{VAR}\left[L_{1}^{2}\right]=2 \sigma^{4} \sum\left(1 / \lambda_{i}\right)^{2}
+$$	 
+
+\noindent The summations of inverted eigenvalues indicate that the more multicollinearity among predictors and subsequently the closer one or more of the eigenvalues are to zero, then the larger the expected value and variance of the squared distance between $\hat{\beta}$ and $\beta$ will be. From this outcome, it should be noted that the coefficient estimates derived from the OLS regression method are much larger with a resulting OLS coefficient vector that is too long, which further implies highly unstable coefficients (Hoerl and Kennard [1]).
+
+\subsubsection{Measuring Multicollinearity}
+
+\noindent There are a number of ways to evaluate the magnitude of multicollinearity in a particular data set. Conducting pairwise scatter plots helps identify highly intercorrelated relationships between two given predictor variables. Large correlation magnitudes among predictors can also become apparent by observing the correlation matrix. However, merely looking at the correlation matrix may not be satisfactory if one or more variables are intercorrelated with several of the remaining predictor variables. In this scenario, a severe multicollinearity problem may go unnoticed, as each pairwise collinear relationship will indicate only minimal correlation between any two variables. A closer look, however, may reveal significant entanglement of information expressed through mild correlation with several predictors in the model (Kidwell and Brown 1982).\\
+
+\noindent For this reason, the researcher may quantify the magnitude of multicollinearity by calculating the variance inflation factors (VIFs), which measures to what extent multicollinearity increases the variance of the OLS estimates. The VIF formula is defined as (Snee 1973):  
+
+$$
+VIF_{j}=\frac{1}{1-R_{j}^{2}}
+$$
+
+\noindent where $ \mathrm R_{j}^2$ is the $ \mathrm R^2$ calculated by regressing variable $j$ on all other predictors of the model. A value of $ \mathrm R_{j}^2$ that approaches one suggests that the other regressors in the model explain a larger amount of variance for variable $j$, indicating high multicollinearity and resulting in a large VIF. According to a general rule of thumb, a VIF larger than 10 suggests the presence of multicollinearity (Kidwell and Brown 1982). However, Snee (1973) cautions that a VIF of as low as five can also be indicative of nonorthogonality. For a VIF equal to one, $ \mathrm R_{j}^2$ is equal to zero, and variable $j$ is therefore independent of all other predictors and implies orthogonality. \\
+
+\noindent Although calculating VIFs are useful for small models or for models with only one or two problematic predictor variables, it proves difficult to determine which predictors are contributing the most to the multicollinearity problem in bigger models with many large VIFs. For this reason, Snee (1973) introduces an "eigenvalue-eigenvector" analysis for the correlation matrix to parse out the model's troublesome predictor variables. As previously noted, the size of the eigenvalues for the simple correlation matrix $\mathbf X^{\prime} \mathbf X$ informs the researcher which predictors are contributing most to the presence of multicollinearity in a regression model: the closer the eigenvalue of a given predictor is to zero, the more multicollinearity the respective predictor introduces into the data set. A closer look at the associated eigenvector offers further insight by indicating which of the model's specific predictor variables exhibit the strongest degree of nonorthogonality to the predictor associated with the lowest eigenvalue. Specifically, the elements of the eigenvector with larger absolute values indicate which predictors are correlated with the variable associated with the lowest eigenvalue (Snee 1973).
+
+\subsubsection{The Ridge Trace and Choosing an Optimal K}
+
+\noindent To obtain the optimal value of $k$ bias in order to adequately stabilize the inflated OLS coefficient estimates and thereby yield more accurate interpretive and/or predictive outcomes, Hoerl and Kennard (1970 [2]) suggest applying a ridge trace. Performing a ridge trace involves marginally increasing $k$ from zero to one along the $x$-axis and plotting the sensitivity of the individual regression coefficient estimates along the $y$-axis. If $k=0$, then the estimates are exactly those derived by the OLS regression. As further $k$ bias is introduced, the researcher observes the behavior of the ridge estimates. The ridge trace reveals the characteristically high sensitivity of predictors with a great deal of multicollinearity, as the coefficient estimates change steeply for low $k$ values and eventually level off for larger magnitudes of bias (Hoerl and Kennard [2]). At times, in which multicollinearity yields false signs for coefficient estimates, the ridge trace will induce shifts dramatic enough to correct the sign (Kidwell and Brown 1982). For predictors that exhibit little to no multicollinearity, the estimates are already stable and therefore remain nearly horizontal for increasing $k$ values. \\
+
+\noindent Since the researcher's objective is to derive stable ridge estimates without introducing too much bias into the regression model, it is imperative to choose an appropriate value for $k$. Hoerl and Kennard (1970 [2]) provide insights on how to optimally choose $k$. For example, the regression coefficients will stabilize and exhibit similar behavior to an orthogonal system for an adequate value of $k$. Furthermore, the absolute values of the coefficients will not appear unreasonably large given the regression model context, and the coefficient signs of the OLS regression that are likely incorrect will change to the appropriate sign. Lastly, the SSR will not be much larger relative to the minimum SSR value (Kidwell and Brown). 
+
+\subsubsection{The Mean Squared Error as a Goodness of Fit Test}
+
+\noindent The above discussion indicates that ridge regression can be used as a suitable linear transformation of the OLS method if one or more predictor variables exhibit some magnitude of multicollinearity that compromises the inferential and/or predictive accuracy of a traditionally derived multi-linear regression model. However, how is it possible to measure the quality of a particular regression so as to confirm that it is in fact robust enough to yield accurate predictions using test data sets? Calculating the average squared prediction error (also called the test MSE) is a common method used to quantify the predictive strength of a given regression method (Hoerl and Kennard 1970 [1]): 
+
+$$
+\operatorname{Ave}\left(y_{0}-\hat{f}\left(x_{0}\right)\right)^{2}
+$$
+
+\noindent The researcher derives the test MSE by using the fitted model to compute predictions from a previously unseen test data set and comparing it to the observed true value calculated at a later time to evaluate the model’s predictive capabilities. In so doing, the researcher evaluates how well a model uses data from previous periods to predict a future outcome variable (Garth et al. 2013).
+	Rewriting the original OLS expression $E\left[L_{1}^{2}\right]=\sigma^{2} \operatorname{Trace}\left(\mathbf{X}^{\prime} \mathbf{X}\right)^{-1}$ in terms of ridge regression to observe the distance between the true parameters, $\beta$, and the corresponding ridge  estimates, it is possible to calculate the average test MSE for ridge:
+$$
+E\left[L_{1}^{2}(k)\right]=E\left[\left(\hat{\beta}^{*}-\beta\right)^{\prime}\left(\hat{\beta}^{*}-\beta\right)\right]
+$$
+
+\noindent Once the above expected distance between $\beta$ and $\hat{\beta}^{*}$ is obtained, $\hat{\beta}^{*}$ is substituted by the expression $\hat{\boldsymbol{\beta}}^{*}=\left[\mathbf{I}_{p}+k\left(\mathbf{X}^{\prime} \mathbf{X}\right)^{-1}\right]^{-1} \hat{\beta}$ to derive the following: 
+
+$$
+\begin{array}{l}
+=E\left[(\hat{\beta}-\beta)^{\prime} Z^{\prime} Z(\hat{\beta}-\beta)\right]+(Z \beta-\beta)^{\prime}(Z \beta-\beta) \\
+=\sigma^{2} \operatorname{Trace}\left(X^{\prime} X\right)^{-1} Z^{\prime} Z+\beta^{\prime}(Z-I)^{\prime}(Z-I) \beta \\
+=\sigma^{2}\left[\operatorname{Trace}\left(X^{\prime} X+k I\right)^{-1}-k \operatorname{Trace}\left(\mathbf{X}^{\prime} \mathbf{X}+k I\right)^{-2}\right]+k^{2} \beta^{\prime}\left(\mathbf{X}^{\prime} \mathbf{X}+k \mathbf{I}\right)^{-2} \mathcal{\beta}\\
+=\sigma^{2} \sum_{1}^{p} \lambda_{i} /\left(\lambda_{i}+k\right)^{2}+k^{2} \beta^{\prime}\left(\mathbf{X}^{\prime} \mathbf{X}+k \mathbf{I})^{-2} \boldsymbol{\beta}\right. \\
+=\gamma_{1}(k)+\gamma_{2}(k)
+\end{array}
+$$
+
+\noindent where the first term represents the total variance of the coefficient estimates and the second term depicts the bias introduced by ridge regression as the squared distance between the linearly transformed beta parameters, $\mathbf Z \beta$, and $\beta$ (Hoerl and Kennard 1970 [1]). Expressing the variance of the ridge coefficient estimates in matrix notation as previously touched upon in section **1.2** sheds light on how the total variance shrinks for increasing values of $k$: 
+
+$$
+\begin{aligned}
+\hat{\boldsymbol{\beta}}^{*} &=\left[\mathbf{I}_{\mathbf{p}}+k\left(\mathbf{X}^{\prime} \mathbf{X}\right)^{-1}\right]^{-1}\hat{\boldsymbol{\beta}}=\mathbf{Z}\hat{\boldsymbol{\beta}}\\&=\mathbf{Z}\left(\mathbf{X}^{\prime} \mathbf{X}\right)^{-1} \mathbf{X}^{\prime} \mathbf{Y}\\\mathbf{Var}\left[\hat{\beta}^{*}\right] &=\mathbf{Z}\left(\mathbf{X}^{\prime} \mathbf{X})^{-1} \mathbf{X}^{\prime} \mathbf{Var}[\mathbf{Y}] \mathbf{X}\left(\mathbf{X}^{\prime} \mathbf{X}\right)^{-1} \mathbf{Z}^{\prime}\right.\\
+&=\sigma^{2} \mathbf{Z}\left(\mathbf{X}^{\prime} \mathbf{X}\right)^{-1} \mathbf{Z}^{\prime} 
+\end{aligned}
+$$	 
+
+\noindent Raising the $k$ bias value results in a reduction of variance for the individual $\hat{\beta}$, which are the diagonal elements of the inverse of the simple correlation matrix. As such, in cases where a multi-linear OLS regression inflates the variance of one or more coefficient estimates due to multicollinearity, applying a ridge regression will yield a lower variance (Marquardt and Snee 1975). This is also evident by the fact that the variance term, $\gamma_{2}(k)$, is a monotonic decreasing function of $k$. Increasing the $k$ value, however, comes at a cost of injecting further bias into the model’s parameter estimates, since the squared bias is a monotonic increasing function of $k$. The characteristics of the first derivatives for $\gamma_{1}(k)$ and $\gamma_{2}(k)$ around the origin highlight the advantage of using ridge regression to mitigate the effects of multicollinearity (Hoerl and Kennard 1970 [1]). A deeper look at these first derivates is reserved for section **A.2** in the Appendix. \\
+
+\noindent As can be seen from the example figure published by Hoerl and Kennard, this exchange of a small increase in bias for a substantially lower variance produces a u-shaped MSE curve, resulting in improved inference and prediction outcomes that make ridge regression superior to OLS for a range of $k$ values. The researcher can then locate the $k$ bias within this range that minimizes the MSE to find the most suitable ridge model for estimation and prediction.
+
+
+\subsection{standardizing}
+
+\noindent Typically, the predictors must be standarized such that they are centered ($\frac{1}{N} \sum_{i=1}^{N} x_{ij}=0$) and have a unit variance ($\frac{1}{N} \sum_{i=1}^{N} x_{ij}^2=1$). It is assumed that the values for the variable of interest are already centered at zero. Centering the conditions allows us to omit the intercept term $\beta_0$ in the lasso optimization (see Appendix A). \\

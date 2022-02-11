@@ -1,0 +1,30 @@
+\section{Model assessment and selection}
+\label{section:mse}
+
+In the following subsections, we explain how to quantify prediction performance using the test MSE and selecting the optimal value of the $\lambda$ tuning parameter through cross-validation.    
+
+\subsection{Measuring prediction performance with the test MSE} 
+
+\noindent To compare the prediction performance of ridge, lasso, and the naive elastic net in a series of simulation exercises and in our real data application, we use the test MSE to select the regularization method that yields the lowest prediction error. As outlined in \cite{hastie2008elements}, we assume $Y=f(X) + \varepsilon$, where $E[\varepsilon]=0$ and $Var(\varepsilon)=\sigma^2_{\varepsilon}$. We then derive the MSE from the expected prediction error of $\hat{f}(X)$ given a selected \textbf{fixed} point $X = x_0$, which is randomly chosen from a simulated test data set. 
+
+\begin{align}
+\label{eqn:expectedprederr}
+Err(x_0) &= E[(Y-\hat{f}(x_0))^2|X=x_0] \\
+&= \sigma^2_{\varepsilon} + [E\hat{f}(x_0) -f(x_0)]^2 + E[\hat{f}(x_0) - E\hat{f}(x_0)]^2 \\
+&= \underbrace{\sigma^2_{\varepsilon}}_\text{Irreducible error} + \: \underbrace{Bias^2(\hat{f}(x_0))+ Var(\hat{f}(x_0))}_\text{MSE}
+\end{align}  
+
+\noindent We replicate this procedure by drawing a single test data set and arbitrarily selecting a fixed point. We then randomly sample several training data sets that we use to iteratively estimate a fitted model for the respective regularized regression method conditional on a particular value of the $\lambda$ tuning parameter. For each model fit, we use the fixed point to obtain a predicted value of the outcome variable. We repeat this procedure for each value in the grid of tuning parameters to derive a test MSE value for all potential values of $\lambda$. Finally, we compute the test MSE for each regression model assigned a specific value of $\lambda$ by measuring the average squared deviation of these predicted values from the actual value of the outcome variable associated with the arbitrarily selected fixed point from the test data set. \\
+
+\noindent Once we have calculated the test MSEs over the $\lambda$ grid for ridge, lasso, and the naive elastic net models, we can determine the best regularization method for a particular simulation exercise or real data set application by identifying the model that yields the lowest test MSE. To decompose the test MSE into its respective components shown in equation \eqref{eqn:expectedprederr} and to subsequently pin down the bias-variance trade-off, we also compute the variance and squared bias for each value of the tuning parameter. Plotting the test MSEs from our ridge regression models in case 2 of the MSE simulation exercises summarized below in Section \ref{section:msesim}, Figure \ref{fig:bias_var} depicts the characteristic features of the MSE and the behavior of the bias-variance trade-off. As $\lambda$ increases, the variance begins to fall, while the bias rises. This behavior, for which we provide a theoretical basis above, produces a textbook u-shaped MSE curve. The minimum of this curve located at a $\lambda$ value of approximately 5 indicates the ridge model that yields the lowest prediction error. 
+    
+\subsection{Locating the optimal tuning parameter with cross-validation}
+
+\noindent For the real data application summarized in Section \ref{section:data}, we follow \cite{zou2005regularization} and use cross-validation to select the optimal shrinkage parameter $\lambda$ of the models. As it is impossible to know the true test MSE when analyzing a real data set, cross-validation serves as a useful method for estimating the test error rate. After holding out the test set for the final evaluation, the procedure entails isolating a subset of the training set observations into a validation set and using the remaining observations for the training set. After generating a fitted model from the training set, we then use the remaining observations in the validation set to estimate the prediction error. A common approach called k-fold cross-validation entails splitting the set of training observations into \textit{k} groups of approximately equal size known as \textit{folds}. We use the first fold as the validation set and the remaining $\textit{k} - 1$ folds as the training set to then calculate the MSE on the observations in the fold that comprises the validation set. We repeat this process \textit{k} times and use a different fold each time to represent the validation set, deriving \textit{k} estimates of the validation MSE for each value in the $\lambda$ grid. We then compute the \textit{k}-fold cross-validation estimate by averaging these validation prediction errors: 
+
+\begin{align}
+    \label{}
+    CV_{(k)}=\frac{1}{k}\sum_{i=1}^{k} \: MSE_i
+\end{align} 
+
+\noindent Practically, it is common to use a 5- or 10-fold cross-validation procedure. However, a special case of \textit{k}-fold cross-validation called leave-one-out cross-validation (LOOCV) sets \textit{k} to the \textit{n} number of observations in a training set. As we will later show in one of our simulation exercises, both LOOCV and 10-fold cross-validation provide accurate estimates of the optimal $\lambda$ tuning parameter. For this reason, we avoid the more computationally intensive LOOCV procedure and use a \textit{10-fold cross validation} to find the value of the tuning parameter that minimizes the test error, which is also the k-fold approach suggested by \cite{zou2005regularization} and by \cite{tibshirani1996regression}.

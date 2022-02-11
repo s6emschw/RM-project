@@ -1,0 +1,61 @@
+\subsection{Ridge}
+\noindent Typically, we compute $\hat{\beta}_{OLS}$ by minimizing the model's residual sum of squares (RSS) (\cite{hastie2008elements}):
+
+\begin{align}
+\label{eqn:eqnolsmin}
+\hat{\beta}_{OLS} = \underset{\beta}{\operatorname{argmin}}\left\{\sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} \beta_{j} x_{i j} \right)^{2}\right\}
+\end{align}
+
+\noindent Similar to the OLS model, the ridge regression derives coefficient estimates $\hat{\beta}^{R}$ by minimizing the RSS. However, it imposes an additional \emph{shrinkage} penalty: (\cite{hastie2008elements}): 
+
+\begin{align}
+\label{eqn:eqnridge}
+\hat{\beta}^{R} = \underset{\beta}{\operatorname{argmin}}\left\{\sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} \beta_{j} x_{i j} \right)^{2}+\lambda \sum_{j=1}^{p}\beta_{j}^{2}\right\}
+\end{align}
+
+\noindent where $\lambda \ge 0$ controls the amount of parameter shrinkage. As $\lambda$ increases, the estimates $\hat{\beta}^{R}$ shrink continuously towards zero. Alternatively, $\lambda=0$ returns the $\hat{\beta}_{OLS}$ estimates. Thus, for any selected value of $\lambda$, we obtain a different set of coefficient estimates, $\hat{\beta}^{R}$. As we discuss in further detail below in Section \ref{section:mse}, there exists a $\lambda^*$ that yields an optimal regularized model by minimizing prediction error, which we quantify using the test MSE.  \\
+
+\noindent An important observation from equation \eqref{eqn:eqnridge} is that the ridge shrinkage penalty is represented by an $\ell_2$-norm, which assures two things: 1) the ridge objective function is a smooth, differentiable function that enables a closed form solution for ridge estimates, and 2) the shrunken coefficients from a ridge regression will be approximately zero for large values of the $\lambda$ tuning parameter, but they will never be set exactly to zero (\cite{murphy2012machine}). \\
+
+\noindent Alternatively, we can express equation \eqref{eqn:eqnridge} as an optimization problem constrained by the term $t \ge 0$: 
+
+\begin{align}
+\label{eqn:eqn3}
+\hat{\beta}^{R} = \underset{\beta}{\operatorname{argmin}}\left\{\sum_{i=1}^{n}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} \beta_{j} x_{i j}\right)^{2}\right\} \text { subject to } \sum_{j=1}^{p}\beta_{j}^{2} \leq t,
+\end{align}
+
+\noindent where there is an inverse correspondence between $\lambda$ and $t$ such that a large value of $t$ is equivalent to a small value of $\lambda$ and vice versa (\cite{hastie2008elements}).  \\
+
+\noindent Following \cite{van2015lecture}, by writing equation \eqref{eqn:eqnridge} in matrix form, we can compute its derivative with respect to $\beta_{j}$ and thus obtain the vector of ridge estimators $\hat{\beta}^{R}$ (see Section \ref{proof:ridgeestimate} of the Appendix for a formal proof): 
+
+\begin{align}
+\label{eqn:betahatR}
+\hat{\beta}^{R}=\left(\mathbf{X}^{\prime} \mathbf{X}+\lambda \mathbf{I}\right)^{-1} \mathbf{X}^{\prime} \mathbf{y} 
+\end{align}
+
+\noindent The size of the $\lambda$ value in the shrinkage penalty imposes bias on the ridge coefficient estimates; thus, the bias of the ridge regressor is (see Section \ref{proofbias} of the Appendix for a formal proof):
+
+\begin{align}
+\label{eqn:betahatRbias}
+\mathbf{E}\left[\hat{\beta}^{R}\right] - \beta=\left(\mathbf{X}^{\prime} \mathbf{X}+\lambda \mathbf{I}\right)^{-1} \mathbf{X}^{\prime} \mathbf{X} \beta - \beta
+\end{align}
+
+% \mathrm{E}\left[\widehat{\beta}_{\lambda} \mid X\right]=\left(X^{\top} X+\lambda I\right)^{-1} X^{\top} X \beta
+
+\noindent On the other hand, the variance of the ridge estimator is depicted in matrix notation as the following:
+\begin{align}
+\label{eqn:betaRvar}
+\operatorname{Var}\left(\hat{\beta}^{R} \right)=\sigma^2\left(\mathbf{X}^{\prime} \mathbf{X}+\lambda \mathbf{I}\right)^{-1}(\mathbf{X}^{\prime} \mathbf{X})\left(\mathbf{X}^{\prime} \mathbf{X}+\lambda \mathbf{I}\right)^{-1}.
+\end{align}
+
+\noindent Due to the variance shrinkage property of ridge, the variance of the estimated ridge coefficients $\hat{\beta}^{R}$ for any value of $\lambda > 0$ will always be smaller than the variance of the OLS estimator. As such, the difference between $\operatorname{Var}\left(\hat{\beta}_{OLS} \right) -\operatorname{Var}\left(\hat{\beta}^{R} \right)$ is positive definite. We provide the formal proof for this property in Section \ref{proofvar}. It is shown from equations \eqref{eqn:betahatRbias} and \eqref{eqn:betaRvar} that ridge regression improves model fit by accepting a marginal increase in the bias of the estimated coefficients in exchange for a substantial reduction in the variance of the estimator. \\
+
+\noindent Moreover, it is straightforward to see that, as $\lambda$ increases, the variance of the ridge estimator will eventually disappear, as the coefficients in the model are shrunk towards zero \cite{van2015lecture}:
+\begin{align}
+\label{eqn:limitvar}
+\lim _{\lambda \rightarrow \infty} \operatorname{Var}[\hat{\beta}^R]=\lim _{\lambda \rightarrow \infty} \sigma^{2} \mathbf{W}_{\lambda}\left(\mathbf{X}^{\prime} \mathbf{X}\right)^{-1} \mathbf{W}_{\lambda}^{\prime}=0. 
+\end{align}
+
+% \noindent Before continuing with the theoretical properties of the lasso regression, it is important to note that before applying any shrinkage method, the regressors must be standardized and centered around their mean. 
+
+% Furthermore, as shown in equation \eqref{eqn:eqnridge}, the intercept $\beta_0$ is not included in the penalty term, as doing so will shift the estimates of predictors by the size of the intercept. The intercept of the model is thus estimated by $\bar{y}=\sum_{1}^{N} y_{i} /N$, while the coefficients of the explanatory variables are estimated through a regularized minimization problem without intercept.

@@ -1,0 +1,92 @@
+\subsection{Naive elastic net}
+
+\noindent To mitigate the drawbacks of lasso outlined above, \cite{zou2005regularization} introduce an alternative regularization method called the naive elastic net, which maintains the best features of both ridge and lasso (i.e., continuous shrinkage and simultaneous variable selection) by introducing a constraint to the RSS minimization problem that is a convex combination of the ridge and lasso shrinkage penalties: 
+
+\begin{align}
+\label{eqn:eqn8}
+\hat{\beta}^{EL} = \underset{\beta}{\operatorname{argmin}}\left\{\sum_{i=1}^{n}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} \beta_{j} x_{i j}\right)^{2}\right\} \text { subject to } \left(1 - \alpha \right)\sum_{j=1}^{p}\left|\beta_{j}\right| + \alpha \sum_{j=1}^{p}\beta_{j}^{2} \leq t,
+\end{align}
+
+\noindent where $\alpha = \lambda_{2} / \left(\lambda_{1} + \lambda_{2}\right)$ is a proportional weight the emphasis on the ridge and lasso features used to perform the elastic net regression, with $\lambda_{1}$ and $\lambda_{2}$ defined as the respective tuning parameters for the lasso and ridge shrinkage penalties.\footnote{$\alpha$ is also called the $\ell_1$-ratio, as it is a combination of $\ell_1$ and $\ell_2$ norms} \\
+
+\noindent Rewriting the elastic net minimization problem in the Lagrangian form, we obtain:
+
+\begin{align}
+\label{eqn:eq_elnet}
+\hat{\beta}^{EL} = \underset{\beta}{\operatorname{argmin}}\Bigg\{\sum_{i=1}^{n}(y_{i}-\beta_{0}-\sum_{j=1}^{p} \beta_{j} x_{i j})^{2} + \lambda(1 - \alpha)\sum_{j=1}^{p}|\beta_{j}| + \lambda\alpha \sum_{j=1}^{p}\beta_{j}^{2} \Bigg\}
+\end{align}
+
+%\noindent To eliminate the limitations found in lasso, the elastic net includes the ridge quadratic expression which elevates the loss function toward being convex. Elastic net method minimizes SSR subject to a penalty which is a convex combination of the lasso and ridge penalty:
+%$$
+%\min _{\beta}\|\mathbf{y}-\mathbf{X} \beta\|^{2}+\lambda\left[\alpha\|\beta\|_{2}^{2}+(1-\alpha)\|\beta\|_{1}\right]
+%$$
+%where,
+%$$
+%\begin{aligned}
+%\|\beta\|_{2}^{2} &=\sum_{j=1}^{p} \beta_{j}^{2}, \\
+%\|\beta\|_{1} &=\sum_{j=1}^{p}\left|\beta_{j}\right|
+%\end{aligned}
+%$$
+
+\noindent When $\alpha = 1$, the elastic net is equivalent to performing a ridge regression. Alternatively, $\alpha = 0.5$ provides a 50\% contribution of each penalty to the objective function. Taking a closer look at the range for parameter $\alpha$, we can observe exactly how the penalty in equation \eqref{eqn:eqn8} generates a compromise between ridge and lasso: For all $\alpha\in[0, 1)$ the elastic net penalty does not have a first derivative at zero and therefore adopts the subset selection characteristics of lasso. As the penalty is strictly convex for all $\alpha>0$, elastic net also employs the ridge regression's shrinkage features. Consequently, the first term of the constraint generates a sparse model solution through variable selection, while the second term groups and shrinks the coefficients of highly correlated predictors. Due to this \emph{grouping effect} the elastic net tends to select more variables than lasso and often outperforms lasso in terms of prediction given a data set with high multicollinearity. For the sake of comparison, Figure \ref{fig:plotnorms} displays the constraint regions for the three shrinkage methods of interest in our paper. 
+
+\subsubsection{Drawbacks of the naive elastic net}
+
+\noindent According to \cite{zou2005regularization}, the elastic net is only a suitable regularization method when its solution is very close to ridge or lasso. Since the naive elastic net is conducted in two-stages, it introduces additional unnecessary shrinkage by first computing the ridge regression coefficients  for a specified grid of values of $\lambda_2$, and then for each $\lambda_2$ cross-validation is used to select $\lambda_1$. Finally, repeat cross-calidation to find the optimal $\lambda_2. $Thus $(\lambda_1$, $\lambda_2)$ are chosen sequentially, causing the socalled \emph{double-shrinkage}.
+%for each fixed $\lambda_{2}$ and then by performing a type of lasso shrinkage along the lasso coefficient solution paths.%
+This double shrinkage hinders variance reduction and introduces additional bias that otherwise does not exist in a purely lasso or ridge regression model. With the final goal of correcting this double shrinkage, the following
+subsection views the naive elastic net as a generalization of the lasso in order to formulate a more robust alternative.
+
+\subsubsection{Deriving a more robust elastic net}
+
+\noindent From \emph{Lemma 1} of \cite{zou2005regularization}, we know that equation \eqref{eqn:eqn8} can be seen as a lasso-type optimization problem. Consider a data set $(\mathbf{y}, \mathbf{X})$, the lasso and ridge tuning parameter values $\left(\lambda_{1}, \lambda_{2}\right)$, and an artificial data set $\left(\mathbf{y}^{*}, \mathbf{X}^{*}\right)$ defined as
+
+$$
+\mathbf{X}_{(n+p) \times p}^{*}=\left(1+\lambda_{2}\right)^{-1 / 2}\left(\begin{array}{c}
+\mathbf{X} \\
+\sqrt{\lambda}_{2} \mathbf{I}
+\end{array}\right), \quad \mathbf{y}_{(n+p)}^{*}=\left(\begin{array}{l}
+\mathbf{y} \\
+0
+\end{array}\right)
+$$
+
+\noindent With $\gamma=\lambda_{1} / \sqrt{(1+\lambda_{2})}$ and $\left.\beta^{*}=\sqrt{(1+\lambda_{2})}\right \beta$, \cite{zou2005regularization} express the naive elastic net criterion as the following 
+
+$$
+L(\gamma, \boldsymbol{\beta})=L\left(\gamma, \boldsymbol{\beta}^{*}\right)=\left|\mathbf{y}^{*}-\mathbf{X}^{*} \boldsymbol{\beta}^{*}\right|^{2}+\gamma\left|\boldsymbol{\beta}^{*}\right|_{1}.
+$$
+
+\noindent Let 
+$$
+\hat{\boldsymbol{\beta}}^{*}=\arg \min _{\boldsymbol{\beta}^{*}} L\left\{\left(\gamma, \boldsymbol{\beta}^{*}\right)\right\}
+$$
+\noindent then
+\begin{align}
+\label{eqn:eqn11}
+\hat{\beta}\text{(naive elastic net)}=\frac{1}{\sqrt{(1+\lambda_{2})}} \hat{\beta}^{*}  .
+\end{align}
+
+\noindent Hence, the naive elastic net optimization can be turned into an analogous lasso problem using the artificial data set in which the sample size is $n+p$ and $\mathbf{X}^{*}$ has full rank. Unlike lasso, the naive elastic net is therefore capable of selecting all $p$ even in a case of high-dimensionality where the number of regressors exceeds the number of observations. \\
+
+\noindent Using the results from \emph{Lemma 1}, we can set up a lasso-type optimization problem for the naive elastic net: 
+
+$$
+\hat{\boldsymbol{\beta}}^{*}=\arg \min _{\beta^{*}}\left|\mathbf{y}^{*}-\mathbf{X}^{*} \beta^{*}\right|^{2}+\frac{\lambda_{1}}{\sqrt{(1+\lambda_{2})}}|\beta^{*}|_{1} .
+$$
+
+\noindent With the adjusted elastic net estimates $\hat{\beta}$ defined by
+
+$$
+\hat{\boldsymbol{\beta}}(\text {robust elastic net})=\sqrt{(1+\lambda_{2})}\hat{\boldsymbol{\beta}}^{*} 
+$$
+
+\noindent and using equation \eqref{eqn:eqn11}, we end up with
+
+\begin{align}
+\label{eqn:eqn14}
+\hat{\boldsymbol{\beta}}\text{(robust elastic net)}=\left(1+\lambda_{2}\right) \hat{\boldsymbol{\beta}}\text{(naive elastic net)}.
+\end{align}
+
+\noindent From this procedure, \cite{zou2005regularization} demonstrate that the robust elastic net coefficient simply entails rescaling the naive elastic net coefficient by $(1 + \lambda_{2})$. As such, this robust version of the elastic net maintains the variable selection feature of the naive elastic net and simultaneously avoids excessive shrinkage. Although \cite{zou2005regularization} formally derive the robust elastic net by rescaling the coefficient of the naive elastic net, they do not compute elastic net using \eqref{eqn:eqn14} in their empirical application. Rather, they implement the LARS-EN algorithm for computing the entire path of estimates. This procedure, however, is not immediately available to us in any Python packages. Scikit-learn, the package we use throughout our project, only supports the naive elastic net.\footnote{See Section \ref{section:software} in the Appendix for a detailed explanation of the scikit-learn package's application of the naive elastic net.} For this reason, we only implement the naive elastic net throughout our simulation studies and real data application.  
+

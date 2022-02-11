@@ -1,0 +1,26 @@
+\subsection{Drawbacks of ordinary least squares}
+\noindent Consider a basic multi-variate OLS regression, $\mathbf{Y} = \mathbf{X} \beta + \varepsilon$, where $\mathbf{Y}=(y_1,...,y_n)$ $\in$ ${\rm I\!R^{n}}$ is the outcome variable, $\mathbf{X}=(x_1,...,x_p)$ $\in$ ${\rm I\!R^{n \times p}}$ is the predictor variable matrix, and $\varepsilon=(\varepsilon_1,...,\varepsilon_n)$ is the error vector. The OLS estimator in matrix notation is:
+
+\begin{align}
+\hat{\beta}_{OLS}=(\mathbf{X}^{\prime}\mathbf{X})^{-1}\mathbf{X}^{\prime}\mathbf{Y}.
+\end{align}
+
+\noindent Two possible drawbacks can arise from the above setting. The first is the presence of imperfect multicollinearity, where the covariance between any two explanatory variables is non-zero. While imperfect multicollinearity does not violate the key assumptions of OLS such that $\hat{\beta}_{OLS}$ remains unbiased, the variance of $\hat{\beta}_{OLS}$ becomes inflated due to the correlation among explanatory variables. Consider the following formulation for the variance of the $j$th regressor (\cite{salmeron2020overcoming}):
+
+\begin{align}
+\operatorname{var}\left(\hat{\beta}_{j}\right)=\frac{\sigma^{2}}{n \cdot \operatorname{var}\left(\mathbf{X}_{j}\right)} \cdot \frac{1}{1-R_{j}^{2}}
+\end{align}
+
+\noindent where $R_j^2$ is the R-squared of the regression of $\mathbf{X}_{j}$ on all the remaining features of the model $\mathbf{X}_{j}=\mathbf{X}_{-j} \cdot \alpha+\mathbf{v}$. When $R_j^2=0$, the $j$th regressor is orthogonal to the other independent variables. However, as the correlation among the regressors becomes stronger such that $R_j^2 \to 1$, the variance of $\hat{\beta_j}$ approaches infinity. Consequently, this dramatic rise in variance proves troublesome for statistical inference, as it causes $t$ statistics to fall and thus can affect the decision of whether to reject the null hypothesis (\cite{o2007caution}). \\
+
+\noindent A second drawback of least squares occurs in the presence of high-dimensionality, where the number $p$ explanatory variables in a regression model exceeds the number of $n$ observations. According to the second assumption of OLS, the matrix $\mathbf{X}$ must have full rank, where $\mathin{rank}(\mathbf{X}) = p$, which requires that $n$ must be larger than $p$. Now, if we consider a case where  $n < p$, $\mathit{rank}(\mathbf{X}) < p$ and thus the matrix does not have full rank. %need some clarification on this sentence
+As such, the inverse of matrix $\mathbf{X}^{\prime}\mathbf{X}$  $(\mathbf{X}^{\prime}\mathbf{X})^{-1}$, cannot be computed and the solution for $\hat{\beta}_{OLS}$ is no longer unique (\cite{tibshirani2017sparsity}). 
+
+% \noindent To mitigate these drawbacks of the OLS regression model in the presence of large multicollinearity and high dimensionality, we can alternatively use \emph{regularization}, or \emph{shrinkage}. On the one hand, these methods shrink the model coefficients towards zero and thus marginally increase the bias of the coefficient estimates, while substantially reducing variability of the model fit. Additionally, particular regularization methods including lasso and elastic net have the additional advantage of performing variable selection by setting the coefficients of less relevant regressors to zero, which subsequently improves model interpretability. In the following subsections, we introduce three of the most commonly used regularized regression techniques - ridge, lasso, and elastic net regression - and how they mitigate variance inflation of the $\hat{\beta}_{OLS}$ solution caused by multicollinearity and high dimensionality.
+
+
+
+
+
+
+

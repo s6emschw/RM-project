@@ -1,0 +1,17 @@
+\begin{tikzpicture}
+\draw[<->] (-5,0) -- (5,0) coordinate (x axis);
+\draw[<->] (0,-5.0) -- (0,5.0) coordinate (y axis);
+\draw[thick,->] (-5,0) -- (5,0) node[anchor=north west] {$\beta_1$};
+\draw[thick,->] (0,-5) -- (0,5) node[anchor=south east] {$\beta_2$};
+\draw[red, thick] (0,0) circle (3 cm);
+\draw[blue,thick,-] (0,3) -- (3,0);
+\draw[blue,thick,-] (-3,0) -- (0,3);
+\draw[blue,thick,-] (-3,0) -- (0,-3);
+\draw[blue,thick,-] (3,0) -- (0,-3);
+\draw [dashed] (-3,0) to [bend left=22] (0,3);
+\draw [dashed] (0,3) to [bend left=22] (3,0);
+\draw [dashed] (3,0) to [bend left=22] (0,-3);
+\draw [dashed] (0,-3) to [bend left=22] (-3,0);
+\end{tikzpicture}
+
+
