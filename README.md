@@ -1,4 +1,4 @@
-# Final Proyect | Research Module Econometrics & Statistics | Wintersemester 2022 | University of Bonn
+# Final Project | Research Module Econometrics & Statistics | Wintersemester 2022 | University of Bonn
 by
 Carolina Alvarez,
 Edoardo Falchi, and
